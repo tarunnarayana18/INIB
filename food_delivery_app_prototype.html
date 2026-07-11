@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Feast — Food Delivery App Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#FF6B00;
+    --orange-light:#FFEDE0;
+    --orange-dark:#E25C00;
+    --white:#FFFFFF;
+    --gray-bg:#F5F5F5;
+    --dark:#222222;
+    --gray-text:#8A8A8E;
+    --green:#22C55E;
+    --radius:16px;
+    --shadow: 0 8px 24px rgba(34,34,34,0.08);
+    --shadow-soft: 0 4px 14px rgba(34,34,34,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:#EDEEF0;
+    color:var(--dark);
+    display:flex;
+    min-height:100vh;
+  }
+  h1,h2,h3,h4,.font-display{font-family:'Poppins',sans-serif;}
+
+  /* ---------- Layout shell ---------- */
+  .app-shell{
+    display:flex;
+    width:100%;
+  }
+  .rail{
+    width:220px;
+    flex-shrink:0;
+    background:var(--dark);
+    color:#fff;
+    padding:28px 18px;
+    position:sticky;
+    top:0;
+    height:100vh;
+  }
+  .rail .brand{
+    display:flex;align-items:center;gap:8px;margin-bottom:28px;
+  }
+  .rail .brand .dot{width:12px;height:12px;background:var(--orange);border-radius:50%;}
+  .rail .brand span{font-family:'Poppins';font-weight:700;font-size:18px;letter-spacing:.3px;}
+  .rail .subtitle{font-size:11px;color:#9a9a9a;margin-bottom:24px;letter-spacing:.5px;text-transform:uppercase;}
+  .rail button{
+    display:flex;align-items:center;gap:10px;
+    width:100%;text-align:left;
+    background:transparent;border:none;color:#c9c9c9;
+    font-family:'Inter';font-size:13.5px;font-weight:500;
+    padding:10px 12px;border-radius:10px;margin-bottom:4px;cursor:pointer;
+    transition:all .15s ease;
+  }
+  .rail button .num{
+    font-family:'Poppins';font-size:11px;font-weight:700;color:#6b6b6b;
+    width:18px;
+  }
+  .rail button:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .rail button.active{background:var(--orange);color:#fff;}
+  .rail button.active .num{color:rgba(255,255,255,0.75);}
+
+  .stage{
+    flex:1;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:48px 24px;
+  }
+  .stage-inner{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+  }
+  .stage-label{
+    font-family:'Poppins';font-weight:600;font-size:14px;color:#6b6b6b;
+    letter-spacing:.4px;
+  }
+
+  /* ---------- Phone frame ---------- */
+  .phone{
+    width:390px;
+    height:844px;
+    background:var(--white);
+    border-radius:44px;
+    border:10px solid var(--dark);
+    box-shadow:0 30px 60px rgba(0,0,0,0.28);
+    overflow:hidden;
+    position:relative;
+  }
+  .notch{
+    position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:150px;height:26px;background:var(--dark);
+    border-radius:0 0 16px 16px;z-index:50;
+  }
+  .screen{
+    width:100%;height:100%;overflow-y:auto;
+    display:flex;flex-direction:column;
+    background:var(--white);
+  }
+  .screen::-webkit-scrollbar{display:none;}
+
+  /* ---------- Shared components ---------- */
+  .status-bar{height:44px;flex-shrink:0;}
+  .px{padding-left:20px;padding-right:20px;}
+  .btn-primary{
+    background:var(--orange);color:#fff;border:none;border-radius:16px;
+    font-family:'Poppins';font-weight:600;font-size:15px;
+    padding:16px;width:100%;cursor:pointer;box-shadow:0 10px 20px rgba(255,107,0,0.28);
+  }
+  .btn-secondary{
+    background:var(--white);color:var(--dark);border:1.5px solid #EAEAEA;border-radius:16px;
+    font-family:'Poppins';font-weight:600;font-size:14px;
+    padding:14px;width:100%;cursor:pointer;
+  }
+  .card{
+    background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-soft);
+  }
+  .pill{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--orange-light);color:var(--orange-dark);
+    font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:20px;
+  }
+  .thumb{
+    border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    font-size:26px;
+  }
+  .bottom-nav{
+    flex-shrink:0;display:flex;justify-content:space-around;align-items:center;
+    padding:12px 8px 22px;border-top:1px solid #F0F0F0;background:#fff;
+  }
+  .bottom-nav .nav-item{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    font-size:10.5px;font-weight:600;color:var(--gray-text);cursor:pointer;
+  }
+  .bottom-nav .nav-item.active{color:var(--orange);}
+  .bottom-nav .nav-item .ic{font-size:19px;}
+  .qty-btn{
+    width:30px;height:30px;border-radius:9px;border:1.5px solid #EAEAEA;background:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--dark);cursor:pointer;
+  }
+  .stepline{
+    position:relative;padding-left:28px;
+  }
+  .stepline .stepdot{
+    position:absolute;left:0;top:2px;width:16px;height:16px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;
+  }
+  .stepline .connector{
+    position:absolute;left:7px;top:18px;width:2px;height:calc(100% + 8px);
+  }
+  /* food gradient thumbs */
+  .g1{background:linear-gradient(135deg,#FFD9A0,#FF6B00);}
+  .g2{background:linear-gradient(135deg,#FFE3C2,#FFB067);}
+  .g3{background:linear-gradient(135deg,#FFC9C9,#FF6B6B);}
+  .g4{background:linear-gradient(135deg,#C9F5D9,#3FBF6F);}
+  .g5{background:linear-gradient(135deg,#D8E6FF,#5B8DEF);}
+  .g6{background:linear-gradient(135deg,#F3D9FF,#B36BFF);}
+  .hero-food{
+    height:280px;width:100%;background:linear-gradient(160deg,#FFD9A0 0%,#FF6B00 55%,#E25C00 100%);
+    display:flex;align-items:center;justify-content:center;font-size:96px;flex-shrink:0;position:relative;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- ================= SIDE RAIL NAV ================= -->
+  <div class="rail">
+    <div class="brand"><div class="dot"></div><span>Feast</span></div>
+    <div class="subtitle">7-Screen Prototype</div>
+    <button class="nav-btn active" data-screen="home"><span class="num">01</span> Home</button>
+    <button class="nav-btn" data-screen="menu"><span class="num">02</span> Restaurant Menu</button>
+    <button class="nav-btn" data-screen="details"><span class="num">03</span> Food Details</button>
+    <button class="nav-btn" data-screen="cart"><span class="num">04</span> Cart</button>
+    <button class="nav-btn" data-screen="checkout"><span class="num">05</span> Checkout</button>
+    <button class="nav-btn" data-screen="tracking"><span class="num">06</span> Order Tracking</button>
+    <button class="nav-btn" data-screen="confirm"><span class="num">07</span> Order Confirmation</button>
+  </div>
+
+  <!-- ================= STAGE ================= -->
+  <div class="stage">
+    <div class="stage-inner">
+      <div class="stage-label" id="stageLabel">01 · Home</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen" id="screenRoot"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const state = {
+  screen: 'home',
+  qty: 1,
+  cart: [
+    {name:'Margherita Pizza', price:9.99, qty:1, g:'g1', emoji:'🍕'},
+    {name:'Classic Cheeseburger', price:6.49, qty:2, g:'g2', emoji:'🍔'},
+  ],
+  labels:{
+    home:'01 · Home', menu:'02 · Restaurant Menu', details:'03 · Food Details',
+    cart:'04 · Cart', checkout:'05 · Checkout', tracking:'06 · Order Tracking', confirm:'07 · Order Confirmation'
+  }
+};
+
+function statusBar(dark=false){
+  const color = dark ? '#fff' : '#222';
+  return `<div class="status-bar px" style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;color:${color};font-family:'Inter';font-weight:600;font-size:13px;">
+    <span>9:41</span>
+    <span style="display:flex;gap:5px;align-items:center;">📶 🔋</span>
+  </div>`;
+}
+
+function bottomNav(active){
+  const items = [
+    {k:'home', ic:'🏠', label:'Home'},
+    {k:'search', ic:'🔍', label:'Search'},
+    {k:'orders', ic:'🧾', label:'Orders'},
+    {k:'profile', ic:'👤', label:'Profile'},
+  ];
+  return `<div class="bottom-nav">
+    ${items.map(i=>`<div class="nav-item ${active===i.k?'active':''}"><span class="ic">${i.ic}</span>${i.label}</div>`).join('')}
+  </div>`;
+}
+
+function renderHome(){
+  return `
+  ${statusBar()}
+  <div class="px" style="padding-top:10px;flex:1;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div style="font-size:12px;color:var(--gray-text);font-weight:500;">Deliver to</div>
+        <div style="font-family:'Poppins';font-weight:700;font-size:16px;display:flex;align-items:center;gap:4px;">📍 Banjara Hills, HYD <span style="color:var(--gray-text);font-size:11px;">▾</span></div>
+      </div>
+      <div class="thumb g5" style="width:42px;height:42px;">🔔</div>
+    </div>
+
+    <div style="margin-top:6px;font-family:'Poppins';font-weight:700;font-size:20px;">Hey Tharun 👋</div>
+    <div style="font-size:13px;color:var(--gray-text);margin-top:2px;">What are you craving today?</div>
+
+    <div style="margin-top:16px;background:var(--gray-bg);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+      <span>🔍</span><span style="color:var(--gray-text);font-size:13.5px;">Search for restaurants or dishes</span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;overflow-x:auto;gap:14px;margin-top:20px;padding-bottom:4px;">
+      ${[['🍕','Pizza'],['🍔','Burger'],['🍛','Biryani'],['🥡','Chinese'],['🍰','Desserts'],['🥤','Drinks']].map(c=>`
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;">
+          <div class="thumb" style="width:54px;height:54px;background:var(--orange-light);font-size:24px;">${c[0]}</div>
+          <div style="font-size:11px;font-weight:600;color:var(--dark);">${c[1]}</div>
+        </div>`).join('')}
+    </div>
+
+    <div class="card g1" style="margin-top:20px;padding:20px;color:#fff;position:relative;overflow:hidden;">
+      <div class="pill" style="background:rgba(255,255,255,0.25);color:#fff;">Limited Time</div>
+      <div style="font-family:'Poppins';font-weight:700;font-size:18px;margin-top:8px;">Flat 50% OFF</div>
+      <div style="font-size:12.5px;opacity:.9;margin-top:2px;">On your first 3 orders · Use code FEAST50</div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px;">
+      <div style="font-family:'Poppins';font-weight:700;font-size:16px;">Popular near you</div>
+      <div style="font-size:12px;color:var(--orange);font-weight:600;">See all</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;padding-bottom:16px;">
+      ${[
+        {n:'The Spice Route',c:'North Indian · Biryani',r:'4.8',t:'25–30 min',g:'g3',e:'🍛'},
+        {n:'Milano Pizzeria',c:'Italian · Pizza',r:'4.6',t:'20–25 min',g:'g1',e:'🍕'},
+        {n:'Dragon Wok',c:'Chinese · Asian',r:'4.5',t:'30–35 min',g:'g4',e:'🥡'},
+      ].map(r=>`
+        <div class="card" data-goto="menu" style="display:flex;gap:12px;padding:10px;cursor:pointer;">
+          <div class="thumb ${r.g}" style="width:74px;height:74px;">${r.e}</div>
+          <div style="flex:1;padding:2px 0;">
+            <div style="font-family:'Poppins';font-weight:600;font-size:14px;">${r.n}</div>
+            <div style="font-size:11.5px;color:var(--gray-text);margin-top:2px;">${r.c}</div>
+            <div style="display:flex;gap:10px;margin-top:6px;font-size:11.5px;font-weight:600;">
+              <span style="color:var(--orange-dark);">⭐ ${r.r}</span>
+              <span style="color:var(--gray-text);">🕒 ${r.t}</span>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>
+  ${bottomNav('home')}
+  `;
+}
+
+function renderMenu(){
+  return `
+  <div style="flex:1;overflow-y:auto;">
+    <div class="hero-food">🍕
+      <div style="position:absolute;top:14px;left:20px;width:34px;height:34px;background:rgba(255,255,255,0.85);border-radius:12px;display:flex;align-items:center;justify-content:center;">←</div>
+    </div>
+    <div class="px" style="margin-top:-24px;position:relative;">
+      <div class="card" style="padding:16px;">
+        <div style="font-family:'Poppins';font-weight:700;font-size:18px;">Milano Pizzeria</div>
+        <div style="font-size:12px;color:var(--gray-text);margin-top:2px;">Italian · Wood-fired Pizza · Pasta</div>
+        <div style="display:flex;gap:14px;margin-top:10px;font-size:12px;font-weight:600;">
+          <span class="pill">⭐ 4.6 (2.1k)</span>
+          <span class="pill">🕒 20–25 min</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;overflow-x:auto;margin-top:18px;padding-bottom:4px;">
+        ${['Pizza','Burgers','Drinks','Desserts'].map((t,i)=>`
+          <div style="flex-shrink:0;padding:8px 16px;border-radius:20px;font-size:12.5px;font-weight:600;
+            background:${i===0?'var(--orange)':'var(--gray-bg)'};color:${i===0?'#fff':'var(--dark)'};">${t}</div>`).join('')}
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px;padding-bottom:20px;">
+        ${[
+          {n:'Margherita Pizza',d:'Tomato, mozzarella, basil',p:'9.99',g:'g1',e:'🍕'},
+          {n:'Pepperoni Feast',d:'Double pepperoni, extra cheese',p:'12.49',g:'g3',e:'🍕'},
+          {n:'Farmhouse Pizza',d:'Onion, capsicum, corn, olives',p:'10.99',g:'g4',e:'🍕'},
+        ].map(f=>`
+          <div class="card" data-goto="details" style="display:flex;gap:12px;padding:10px;cursor:pointer;">
+            <div class="thumb ${f.g}" style="width:72px;height:72px;">${f.e}</div>
+            <div style="flex:1;">
+              <div style="font-family:'Poppins';font-weight:600;font-size:14px;">${f.n}</div>
+              <div style="font-size:11.5px;color:var(--gray-text);margin-top:3px;">${f.d}</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+                <div style="font-family:'Poppins';font-weight:700;font-size:13.5px;">$${f.p}</div>
+                <div style="background:var(--orange-light);color:var(--orange-dark);font-weight:700;font-size:11.5px;padding:5px 14px;border-radius:10px;" data-goto="details">Add</div>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function renderDetails(){
+  return `
+  <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;">
+    <div class="hero-food" style="height:320px;">🍕
+      <div style="position:absolute;top:14px;left:20px;width:34px;height:34px;background:rgba(255,255,255,0.85);border-radius:12px;display:flex;align-items:center;justify-content:center;">←</div>
+      <div style="position:absolute;top:14px;right:20px;width:34px;height:34px;background:rgba(255,255,255,0.85);border-radius:12px;display:flex;align-items:center;justify-content:center;">♡</div>
+    </div>
+    <div class="px" style="margin-top:20px;flex:1;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-family:'Poppins';font-weight:700;font-size:19px;">Margherita Pizza</div>
+          <div style="font-size:12px;color:var(--gray-text);margin-top:3px;">Milano Pizzeria · Classic Italian</div>
+        </div>
+        <span class="pill">⭐ 4.7</span>
+      </div>
+
+      <div style="font-size:13px;color:var(--gray-text);line-height:1.6;margin-top:14px;">
+        A timeless classic — hand-tossed thin crust topped with San Marzano tomato sauce, fresh mozzarella, and fragrant basil leaves, finished with a drizzle of olive oil.
+      </div>
+
+      <div style="font-family:'Poppins';font-weight:600;font-size:13.5px;margin-top:18px;">Ingredients</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        ${['Mozzarella','Tomato Sauce','Basil','Olive Oil','Wheat Base'].map(i=>`
+          <span style="background:var(--gray-bg);font-size:11.5px;font-weight:500;padding:6px 12px;border-radius:20px;">${i}</span>`).join('')}
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;">
+        <div style="font-family:'Poppins';font-weight:600;font-size:14px;">Quantity</div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="qty-btn" id="qtyMinus">−</div>
+          <div style="font-family:'Poppins';font-weight:700;font-size:15px;width:14px;text-align:center;" id="qtyVal">${state.qty}</div>
+          <div class="qty-btn" id="qtyPlus">+</div>
+        </div>
+      </div>
+    </div>
+    <div class="px" style="padding-bottom:24px;padding-top:8px;display:flex;gap:12px;align-items:center;">
+      <div style="font-family:'Poppins';font-weight:700;font-size:18px;">$9.99</div>
+      <div style="flex:1;"><button class="btn-primary" data-goto="cart">Add to Cart</button></div>
+    </div>
+  </div>
+  `;
+}
+
+function cartTotals(){
+  const sub = state.cart.reduce((a,c)=>a+c.price*c.qty,0);
+  const fee = 2.5, tax = sub*0.05;
+  return {sub, fee, tax, total: sub+fee+tax};
+}
+
+function renderCart(){
+  const t = cartTotals();
+  return `
+  <div style="flex:1;overflow-y:auto;">
+    ${statusBar()}
+    <div class="px" style="margin-top:6px;display:flex;align-items:center;gap:10px;">
+      <div style="width:34px;height:34px;background:var(--gray-bg);border-radius:12px;display:flex;align-items:center;justify-content:center;">←</div>
+      <div style="font-family:'Poppins';font-weight:700;font-size:17px;">Your Cart</div>
+    </div>
+
+    <div class="px" style="display:flex;flex-direction:column;gap:12px;margin-top:16px;">
+      ${state.cart.map((c,idx)=>`
+        <div class="card" style="display:flex;gap:12px;padding:10px;">
+          <div class="thumb ${c.g}" style="width:64px;height:64px;">${c.emoji}</div>
+          <div style="flex:1;">
+            <div style="font-family:'Poppins';font-weight:600;font-size:13.5px;">${c.name}</div>
+            <div style="font-family:'Poppins';font-weight:700;font-size:13px;margin-top:4px;">$${c.price.toFixed(2)}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="qty-btn" data-cartminus="${idx}">−</div>
+            <div style="font-weight:700;width:12px;text-align:center;font-size:13px;">${c.qty}</div>
+            <div class="qty-btn" data-cartplus="${idx}">+</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="px" style="margin-top:18px;">
+      <div style="background:var(--gray-bg);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+        <span>🏷️</span><span style="font-size:13px;color:var(--gray-text);flex:1;">Enter promo code</span>
+        <span style="font-size:12.5px;font-weight:700;color:var(--orange);">Apply</span>
+      </div>
+
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:9px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;color:var(--gray-text);"><span>Subtotal</span><span style="color:var(--dark);font-weight:600;">$${t.sub.toFixed(2)}</span></div>
+        <div style="display:flex;justify-content:space-between;color:var(--gray-text);"><span>Delivery Fee</span><span style="color:var(--dark);font-weight:600;">$${t.fee.toFixed(2)}</span></div>
+        <div style="display:flex;justify-content:space-between;color:var(--gray-text);"><span>Taxes</span><span style="color:var(--dark);font-weight:600;">$${t.tax.toFixed(2)}</span></div>
+        <div style="height:1px;background:#EFEFEF;margin:6px 0;"></div>
+        <div style="display:flex;justify-content:space-between;font-family:'Poppins';font-weight:700;font-size:15px;"><span>Total</span><span>$${t.total.toFixed(2)}</span></div>
+      </div>
+    </div>
+
+    <div class="px" style="padding-top:22px;padding-bottom:24px;">
+      <button class="btn-primary" data-goto="checkout">Proceed to Checkout</button>
+    </div>
+  </div>
+  `;
+}
+
+function renderCheckout(){
+  const t = cartTotals();
+  return `
+  <div style="flex:1;overflow-y:auto;">
+    ${statusBar()}
+    <div class="px" style="margin-top:6px;display:flex;align-items:center;gap:10px;">
+      <div style="width:34px;height:34px;background:var(--gray-bg);border-radius:12px;display:flex;align-items:center;justify-content:center;">←</div>
+      <div style="font-family:'Poppins';font-weight:700;font-size:17px;">Checkout</div>
+    </div>
+
+    <div class="px" style="margin-top:18px;">
+      <div style="font-family:'Poppins';font-weight:600;font-size:13px;color:var(--gray-text);">DELIVERY ADDRESS</div>
+      <div class="card" style="padding:14px;margin-top:8px;display:flex;gap:12px;align-items:flex-start;">
+        <span style="font-size:18px;">🏠</span>
+        <div style="flex:1;">
+          <div style="font-family:'Poppins';font-weight:600;font-size:13.5px;">Home</div>
+          <div style="font-size:12px;color:var(--gray-text);margin-top:2px;">Plot 14, Banjara Hills, Hyderabad, TG 500034</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--orange);">Edit</div>
+      </div>
+
+      <div style="font-family:'Poppins';font-weight:600;font-size:13px;color:var(--gray-text);margin-top:22px;">PAYMENT METHOD</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+        ${[['💳','Credit / Debit Card',true],['📱','UPI',false],['💵','Cash on Delivery',false]].map(p=>`
+          <div class="card" style="padding:13px 14px;display:flex;align-items:center;gap:12px;">
+            <span style="font-size:17px;">${p[0]}</span>
+            <div style="flex:1;font-size:13.5px;font-weight:600;">${p[1]}</div>
+            <div style="width:18px;height:18px;border-radius:50%;border:2px solid ${p[2]?'var(--orange)':'#DADADA'};display:flex;align-items:center;justify-content:center;">
+              ${p[2]?'<div style="width:9px;height:9px;background:var(--orange);border-radius:50%;"></div>':''}
+            </div>
+          </div>`).join('')}
+      </div>
+
+      <div style="font-family:'Poppins';font-weight:600;font-size:13px;color:var(--gray-text);margin-top:22px;">ORDER SUMMARY</div>
+      <div class="card" style="padding:14px;margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;color:var(--gray-text);"><span>${state.cart.length} items</span><span style="color:var(--dark);font-weight:600;">$${t.sub.toFixed(2)}</span></div>
+        <div style="display:flex;justify-content:space-between;color:var(--gray-text);"><span>Delivery + Taxes</span><span style="color:var(--dark);font-weight:600;">$${(t.fee+t.tax).toFixed(2)}</span></div>
+        <div style="height:1px;background:#EFEFEF;margin:4px 0;"></div>
+        <div style="display:flex;justify-content:space-between;font-family:'Poppins';font-weight:700;font-size:14.5px;"><span>Total</span><span>$${t.total.toFixed(2)}</span></div>
+      </div>
+    </div>
+
+    <div class="px" style="padding-top:22px;padding-bottom:24px;">
+      <button class="btn-primary" data-goto="tracking">Place Order</button>
+    </div>
+  </div>
+  `;
+}
+
+function renderTracking(){
+  const steps = [
+    {label:'Order Confirmed', done:true},
+    {label:'Preparing your food', done:true},
+    {label:'Out for delivery', done:true, current:true},
+    {label:'Delivered', done:false},
+  ];
+  return `
+  <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;">
+    ${statusBar()}
+    <div class="px" style="margin-top:6px;display:flex;align-items:center;gap:10px;">
+      <div style="width:34px;height:34px;background:var(--gray-bg);border-radius:12px;display:flex;align-items:center;justify-content:center;">←</div>
+      <div style="font-family:'Poppins';font-weight:700;font-size:17px;">Track Order</div>
+    </div>
+
+    <div class="px" style="margin-top:12px;">
+      <div style="border-radius:18px;height:170px;background:
+        repeating-linear-gradient(45deg,#EAF2FF,#EAF2FF 10px,#F5F9FF 10px,#F5F9FF 20px);
+        display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+        <div style="position:absolute;width:100%;height:100%;">
+          <div style="position:absolute;top:30%;left:20%;width:14px;height:14px;background:var(--dark);border-radius:50%;border:3px solid #fff;"></div>
+          <div style="position:absolute;bottom:25%;right:22%;width:16px;height:16px;background:var(--orange);border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 6px rgba(255,107,0,0.2);"></div>
+          <svg width="100%" height="100%" style="position:absolute;top:0;left:0;"><path d="M 78 60 Q 180 30 300 130" stroke="#B9C6DA" stroke-width="3" fill="none" stroke-dasharray="6,6"/></svg>
+        </div>
+        <span style="font-size:12px;color:#9AA6B8;font-weight:600;background:rgba(255,255,255,0.85);padding:5px 10px;border-radius:20px;">Live Map Preview</span>
+      </div>
+    </div>
+
+    <div class="px" style="margin-top:20px;">
+      <div class="card" style="padding:14px;display:flex;align-items:center;gap:12px;">
+        <div class="thumb" style="width:48px;height:48px;background:var(--orange-light);font-size:20px;">🧑‍🍳</div>
+        <div style="flex:1;">
+          <div style="font-family:'Poppins';font-weight:600;font-size:13.5px;">Ravi Kumar</div>
+          <div style="font-size:11.5px;color:var(--gray-text);">Delivery Partner · ⭐ 4.9</div>
+        </div>
+        <div style="width:38px;height:38px;background:var(--gray-bg);border-radius:12px;display:flex;align-items:center;justify-content:center;">📞</div>
+        <div style="width:38px;height:38px;background:var(--gray-bg);border-radius:12px;display:flex;align-items:center;justify-content:center;">💬</div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+        <div style="font-family:'Poppins';font-weight:600;font-size:14px;">Estimated Arrival</div>
+        <div class="pill">⏱ 12–15 min</div>
+      </div>
+
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:22px;">
+        ${steps.map((s,i)=>`
+          <div class="stepline">
+            <div class="stepdot" style="background:${s.done?'var(--orange)':'#E2E2E2'};">${s.done?'✓':''}</div>
+            ${i<steps.length-1?`<div class="connector" style="background:${steps[i+1].done||s.done?'var(--orange)':'#E2E2E2'};"></div>`:''}
+            <div style="font-size:13.5px;font-weight:${s.current?'700':'500'};color:${s.done?'var(--dark)':'var(--gray-text)'};">${s.label}${s.current?' <span style=\"color:var(--orange);\">· now</span>':''}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function renderConfirm(){
+  return `
+  <div style="flex:1;display:flex;flex-direction:column;">
+    ${statusBar()}
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;">
+      <div style="width:96px;height:96px;border-radius:50%;background:#E8FBEF;display:flex;align-items:center;justify-content:center;margin-bottom:22px;">
+        <div style="width:66px;height:66px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;">✓</div>
+      </div>
+      <div style="font-family:'Poppins';font-weight:700;font-size:21px;">Order Confirmed!</div>
+      <div style="font-size:13px;color:var(--gray-text);margin-top:8px;line-height:1.6;">Your food is being prepared with love and will be on its way shortly.</div>
+
+      <div class="card" style="width:100%;padding:16px;margin-top:24px;display:flex;justify-content:space-between;">
+        <div style="text-align:left;">
+          <div style="font-size:11px;color:var(--gray-text);">Order ID</div>
+          <div style="font-family:'Poppins';font-weight:700;font-size:13.5px;margin-top:2px;">#FT-20493</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--gray-text);">Estimated Delivery</div>
+          <div style="font-family:'Poppins';font-weight:700;font-size:13.5px;margin-top:2px;">35–40 min</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="px" style="padding-bottom:26px;display:flex;flex-direction:column;gap:10px;">
+      <button class="btn-primary" data-goto="tracking">Track Order</button>
+      <button class="btn-secondary" data-goto="home">Back to Home</button>
+    </div>
+  </div>
+  `;
+}
+
+const renderers = {
+  home: renderHome, menu: renderMenu, details: renderDetails,
+  cart: renderCart, checkout: renderCheckout, tracking: renderTracking, confirm: renderConfirm
+};
+
+function render(){
+  document.getElementById('screenRoot').innerHTML = renderers[state.screen]();
+  document.getElementById('stageLabel').textContent = state.labels[state.screen];
+  document.querySelectorAll('.rail .nav-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.screen===state.screen);
+  });
+  attachHandlers();
+}
+
+function attachHandlers(){
+  document.querySelectorAll('[data-goto]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      state.screen = el.dataset.goto;
+      render();
+    });
+  });
+  const qm = document.getElementById('qtyMinus');
+  const qp = document.getElementById('qtyPlus');
+  if(qm) qm.addEventListener('click', ()=>{ state.qty = Math.max(1,state.qty-1); document.getElementById('qtyVal').textContent = state.qty; });
+  if(qp) qp.addEventListener('click', ()=>{ state.qty = state.qty+1; document.getElementById('qtyVal').textContent = state.qty; });
+
+  document.querySelectorAll('[data-cartminus]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx = +el.dataset.cartminus;
+      state.cart[idx].qty = Math.max(1, state.cart[idx].qty-1);
+      render();
+    });
+  });
+  document.querySelectorAll('[data-cartplus]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx = +el.dataset.cartplus;
+      state.cart[idx].qty += 1;
+      render();
+    });
+  });
+}
+
+document.querySelectorAll('.rail .nav-btn').forEach(b=>{
+  b.addEventListener('click', ()=>{ state.screen = b.dataset.screen; render(); });
+});
+
+render();
+</script>
+</body>
+</html>
