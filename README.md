@@ -23,7 +23,7 @@ The prototype covers the full user journey — from browsing restaurants to trac
 - **Style:** 16px rounded corners, soft shadows, consistent 16–24px spacing
 
 ## 🔗 Live Demo
-[View the interactive prototype](#) *(paste your GitHub Pages link here)*
+https://tarunnarayana18.github.io/INIB/food_delivery_app_prototype.html
 
 ## 🛠 Built With
 HTML, CSS, JavaScript
